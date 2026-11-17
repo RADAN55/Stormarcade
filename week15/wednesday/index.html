@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wednesday · Bend It Like Science · 30-Minute Arcade</title>
+<style>
+:root{--ink:#16181d;--navy:#10203d;--grass:#1f7a4d;--gold:#f2b705;--cream:#fbf8f1;--red:#d7263d;--muted:#5d6472;--sky:#1e88e5;--purple:#6a3fb5}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0b1f3a;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+.app{max-width:980px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;color:#fff;flex-wrap:wrap;position:sticky;top:0;background:#0b1f3a;z-index:5}
+header h1{margin:0;font-size:20px}header h1 span{color:var(--gold)}
+.clock{font-variant-numeric:tabular-nums;font-weight:900;font-size:30px;background:rgba(255,255,255,.12);padding:4px 14px;border-radius:12px}
+.clock.warn{background:var(--red)}
+.pts{font-weight:800;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:999px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:11px 16px;font-weight:700;font-size:16px;min-height:46px}
+.btn{background:var(--gold);color:var(--ink)}.btn.navy{background:var(--navy);color:#fff}.btn.gray{background:#666;color:#fff}.btn.red{background:var(--red);color:#fff}
+button:disabled{opacity:.6;cursor:default}
+main{flex:1;padding:0 12px 24px}
+.card{background:var(--cream);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3);margin-top:12px}
+.hidden{display:none}
+h2{margin:0 0 6px;color:var(--navy);font-size:24px}
+.sub{color:var(--muted);margin:0 0 12px}
+.stations{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.st{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:3px;min-height:110px}
+.st b{font-size:17px}.st small{color:var(--muted)}.st .m{margin-top:auto;font-weight:800;color:var(--navy)}
+.st.done{border-color:var(--grass);background:#f1fbf5}
+.inst{background:#fff8dc;border-left:5px solid var(--gold);padding:10px 12px;border-radius:8px;margin:8px 0;font-size:16px}
+.inst i{display:block;color:var(--muted);font-size:14px}
+.pass{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px 14px;font-size:17px;line-height:1.6}
+.pass mark{background:#fff176;padding:0 3px;border-radius:3px}
+.subq{font-weight:700;color:var(--navy);margin:12px 0 4px;font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.chip{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:8px 14px;font-weight:700;font-size:16px;min-height:42px;text-align:left}
+.chip.sel{background:var(--gold)}.chip.ok{background:#d8f3e3;border-color:var(--grass)}.chip.bad{background:#fde2e4;border-color:var(--red)}.chip.used{opacity:.35}
+.audio{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.audio .btn{background:var(--purple);color:#fff}
+.transcript{background:#fff;border:1px dashed #999;border-radius:10px;padding:10px;font-size:16px;line-height:1.5}
+.fb{margin-top:10px;font-size:17px;font-weight:700;color:var(--navy);min-height:24px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.blank{display:inline-block;min-width:100px;border-bottom:3px solid var(--navy);padding:0 8px;font-weight:800;color:#3b5bdb;cursor:pointer;text-align:center;background:#f4f6ff;border-radius:6px 6px 0 0}
+.blank.active{background:#fff2b3}.blank.ok{color:var(--grass)}.blank.bad{color:var(--red)}
+textarea{width:100%;min-height:200px;font:inherit;font-size:17px;line-height:1.5;padding:12px;border:2px solid var(--ink);border-radius:12px;resize:vertical}
+.starters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.starters button{background:#e8f0ff;color:var(--navy);padding:6px 10px;min-height:36px;font-size:14px;border-radius:999px}
+table.rub{width:100%;border-collapse:collapse;background:#fff;font-size:15px;margin-top:10px}
+table.rub th,table.rub td{border:2px solid var(--ink);padding:8px;vertical-align:top;text-align:left}
+table.rub th{background:var(--navy);color:#fff}
+table.rub td.sc{text-align:center;font-weight:900;font-size:22px;width:70px}
+.lvl{display:inline-block;padding:6px 14px;border-radius:999px;font-weight:900;font-size:18px;color:#fff;background:var(--navy)}
+/* arcade */
+.arc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.ag{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:110px}
+.ag b{font-size:17px}.ag small{color:var(--muted)}.ag .best{margin-top:auto;color:var(--grass);font-weight:700;font-size:13px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.tm{height:12px;background:#e4e0d4;border-radius:999px;flex:1;min-width:120px;overflow:hidden}.tm i{display:block;height:100%;background:var(--grass);width:100%;transition:width .2s linear}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mole{background:#fff;border:3px solid var(--ink);border-radius:14px;min-height:74px;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;transition:transform .08s}
+.mole.pop{background:var(--gold);transform:scale(1.04)}
+.mole.hit{background:#d8f3e3;border-color:var(--grass)}.mole.miss{background:#fde2e4;border-color:var(--red)}
+.big{font-size:40px;font-weight:900;color:var(--navy);text-align:center;margin:6px 0}
+.stmt{background:#fff;border:3px solid var(--ink);border-radius:16px;padding:18px;font-size:22px;font-weight:700;text-align:center;min-height:110px;display:flex;align-items:center;justify-content:center}
+.tf{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.tf button{font-size:22px;min-height:64px}
+.ordlist{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.ord{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px 12px;font-size:16px}
+.ord .n{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.ord .mv{margin-left:auto;display:flex;gap:4px}.ord .mv button{padding:4px 10px;min-height:34px;background:#eee}
+.ord.ok{border-color:var(--grass);background:#f1fbf5}.ord.bad{border-color:var(--red);background:#fff4f5}
+.rec{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.rec .time{font-weight:800;font-size:20px;min-width:60px}
+.check{display:flex;flex-direction:column;gap:6px;margin:8px 0}.check label{display:flex;gap:8px;align-items:flex-start;font-size:16px;background:#fff;border-radius:10px;padding:8px 10px;border:1px solid #ccc}.check input{width:20px;height:20px;margin-top:2px}
+.report{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px;font-family:ui-monospace,monospace;font-size:14px;white-space:pre-wrap}
+svg.diag{width:100%;height:auto;background:#fff;border:2px solid var(--ink);border-radius:12px}
+@media (max-width:520px){header h1{font-size:16px}.clock{font-size:24px}.grid{gap:6px}.mole{font-size:15px;min-height:64px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>⚡ Wednesday · <span>Bend It Like Science</span></h1>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div class="pts" id="pts">0 pts</div><div class="clock" id="clock">30:00</div><button class="btn" id="btnStart" style="min-height:40px;padding:6px 14px">▶ Start 30 min</button></div>
+</header>
+<main>
+
+<!-- HUB -->
+<section id="hub" class="card">
+  <h2>Your 30-minute plan · Tu plan de 30 minutos</h2>
+  <p class="sub">Press <b>Start</b>, then do the stations in order. Points are saved on this device. <i>Haz las estaciones en orden.</i></p>
+  <div class="stations" id="stations"></div>
+  <div class="actions"><button class="btn navy" id="btnReport">📋 My report card</button><button class="btn gray" id="btnReset">Reset my scores</button></div>
+</section>
+
+<!-- STATION VIEW -->
+<section id="view" class="card hidden">
+  <div class="bar"><h2 id="vTitle"></h2><span id="vTag" class="lvl"></span></div>
+  <div id="vBody"></div>
+  <div class="fb" id="vFb"></div>
+  <div class="actions"><button class="btn" id="vCheck">Check</button><button class="btn navy" id="vBack">← Plan</button></div>
+</section>
+
+<!-- REPORT -->
+<section id="rep" class="card hidden">
+  <h2>📋 Report card · Boleta</h2>
+  <div class="report" id="repTxt"></div>
+  <div class="actions"><button class="btn" id="btnCopy">Copy report</button><button class="btn navy" id="repBack">← Plan</button></div>
+</section>
+
+</main>
+<div style="color:rgba(255,255,255,.55);font-size:12px;text-align:center;padding:10px">Storm Studio · Laurel High School · EL 9–12 · Week 15 Wednesday · Text 3: The Science of the Curving Kick</div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const sg=k=>{try{return localStorage.getItem(k)}catch(e){return null}}, ss=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let S=JSON.parse(sg('wed15')||'{}'); // scores per station
+function save(){ss('wed15',JSON.stringify(S)); $('pts').textContent=Object.values(S).reduce((a,b)=>a+(b.pts||0),0)+' pts';}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+// sound
+let actx=null;function beep(f,d,t='square',v=.07){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+d);o.stop(actx.currentTime+d)}catch(e){}}
+const sfx={ok:()=>{beep(660,.1);setTimeout(()=>beep(880,.12),100)},bad:()=>beep(150,.25,'sawtooth'),win:()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.15,'triangle',.1),i*100))};
+
+// ---------- 30-minute clock ----------
+let total=30*60,left=total,clk=null;
+$('btnStart').onclick=()=>{ if(clk){clearInterval(clk);clk=null;$('btnStart').textContent='▶ Resume';return;} $('btnStart').textContent='⏸ Pause'; clk=setInterval(()=>{left--;drawClock();if(left===300){beep(880,.3,'triangle',.15);} if(left<=0){clearInterval(clk);clk=null;$('clock').textContent='TIME';$('btnStart').textContent='Done';sfx.win();showReport();}},1000); };
+function drawClock(){ const m=Math.floor(left/60),s=left%60; $('clock').textContent=m+':'+String(s).padStart(2,'0'); $('clock').classList.toggle('warn',left<=300); }
+
+// ---------- content ----------
+const TALK="Here is how a curving kick works. When a player kicks the ball off-center, the ball spins. The spinning ball drags the air around with it. On one side, the air moves faster, and the pressure gets lower. On the other side, the air moves slower, and the pressure is higher. The higher pressure pushes the ball toward the low-pressure side, so the ball bends in the air. Scientists call this the Magnus effect.";
+const PASSAGE=`A soccer ball does not have to fly straight. A skilled player can make it <mark>bend</mark> around a wall of defenders and into the goal. The secret is <mark>spin</mark>. When the player kicks the ball off-center, the ball starts to rotate. As it flies, the spinning surface <mark>drags</mark> a thin layer of air around with it. On the side spinning forward, the air moves faster and the <mark>pressure</mark> drops. On the opposite side, the air moves slower and the pressure stays higher. Air always pushes from high pressure toward low pressure, so the ball is pushed sideways and its path curves. Scientists call this the Magnus effect. The faster the spin, the <mark>sharper</mark> the curve. That is why a free kick can start outside the goal post and finish inside the net, leaving the goalkeeper frozen.`;
+const LQ=[{q:'What makes the ball spin?',o:['Kicking it off-center','Kicking it very softly','The goalkeeper'],a:0},{q:'On the faster-air side, the pressure gets…',o:['lower','higher','the same'],a:0},{q:'The ball is pushed toward the side with…',o:['lower pressure','higher pressure','more players'],a:0},{q:'What is the speaker\'s main purpose?',o:['to explain how a curving kick works','to describe a famous game','to teach the rules of soccer'],a:0}];
+const RQ=[{q:'What is the "secret" to bending the ball?',o:['spin','a heavier ball','kicking harder'],a:0},{q:'In this passage, "drags" means…',o:['pulls along','drops','stops'],a:0},{q:'Which sentence states the CAUSE of the curve?',o:['Air pushes from high pressure toward low pressure.','A soccer ball does not have to fly straight.','The goalkeeper is frozen.'],a:0},{q:'What happens with FASTER spin?',o:['a sharper curve','a straighter path','a slower ball'],a:0},{q:'The best title for this passage is…',o:['Why a Kicked Ball Bends','The History of Free Kicks','How to Be a Goalkeeper'],a:0}];
+const STEPS=['The player kicks the ball off-center.','The ball spins as it flies.','Air moves faster on one side, so pressure drops there.','Higher pressure on the other side pushes the ball.','The ball curves toward the low-pressure side.'];
+const CLOZE={text:'When a player kicks the ball off-center, it {0}. The spinning ball drags the {1} around it. On one side the air moves faster, so the {2} is lower. The high pressure {3} the ball, and its path {4}.',ans:['spins','air','pressure','pushes','curves'],bank:['spins','air','pressure','pushes','curves','stops','goalkeeper']};
+const WORDS=[['spin','to turn around and around'],['pressure','the push of air on a surface'],['curve','to bend; not straight'],['drag','to pull something along'],['off-center','not in the middle'],['sharper','stronger; more sudden'],['surface','the outside of something'],['path','the line something moves along'],['frozen','not moving'],['rotate','to spin']];
+const TF=[['A ball kicked in the exact center will spin a lot.',false],['Faster air means lower pressure.',true],['The ball is pushed toward the high-pressure side.',false],['The Magnus effect explains the curve.',true],['More spin makes a sharper curve.',true],['The goalkeeper creates the spin.',false],['Air pushes from high pressure to low pressure.',true],['A curving ball flies in a straight line.',false],['Off-center kicks make the ball rotate.',true],['Pressure is the push of air on a surface.',true]];
+
+const STATIONS=[
+ {id:'listen',n:'1 · Listen',t:'ELPA21 Listening · Short Talk',min:4,type:'listen'},
+ {id:'read',n:'2 · Read',t:'ELPA21 Reading · Science Passage',min:6,type:'read'},
+ {id:'arcade',n:'3 · Arcade',t:'Arcade · 3 games',min:8,type:'arcade'},
+ {id:'write',n:'4 · Write',t:'ELPA21 Writing · Auto-graded paragraph',min:9,type:'write'},
+ {id:'speak',n:'5 · Speak',t:'ELPA21 Speaking · Explain the diagram',min:3,type:'speak'}
+];
+function hub(){ const b=$('stations'); b.innerHTML=''; STATIONS.forEach(s=>{ const d=document.createElement('button'); d.className='st'+(S[s.id]?' done':''); d.innerHTML=`<b>${s.n}</b><small>${esc(s.t)}</small><span class="m">${s.min} min · ${S[s.id]?'⭐ '+S[s.id].pts+' pts':'not started'}</span>`; d.onclick=()=>open(s); b.appendChild(d); }); show('hub'); save(); }
+function show(id){['hub','view','rep'].forEach(s=>$(s).classList.toggle('hidden',s!==id)); if(window.speechSynthesis)speechSynthesis.cancel(); stopGame();}
+$('btnReset').onclick=()=>{ if(confirm('Reset all scores on this device?')){S={};save();hub();} };
+$('vBack').onclick=hub; $('repBack').onclick=hub; $('btnReport').onclick=showReport;
+
+// ---------- helpers ----------
+function say(t,r=0.92){ if(!window.speechSynthesis){$('vFb').textContent='This browser cannot read aloud — use "Show text".';return;} speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=r; const v=speechSynthesis.getVoices().find(v=>/en-US/i.test(v.lang)); if(v)u.voice=v; speechSynthesis.speak(u); }
+if(window.speechSynthesis)speechSynthesis.getVoices();
+function audioBtns(t){ return `<div class="audio"><button class="btn" onclick="say(TALK)">▶ Play</button><button class="btn gray" onclick="say(TALK,0.75)">🐢 Slower</button><button class="btn gray" onclick="speechSynthesis&&speechSynthesis.cancel()">■ Stop</button><button class="btn gray" onclick="$('tr').classList.toggle('hidden')">Show text</button></div><div id="tr" class="transcript hidden">${esc(t)}</div>`; }
+function mc(qs){ return qs.map((it,i)=>`<div class="subq">${i+1}. ${esc(it.q)}</div><div class="chips" data-q="${i}">${shuffle(it.o.map((o,j)=>({o,j}))).map(p=>`<button class="chip" data-i="${p.j}" onclick="pick(this)">${esc(p.o)}</button>`).join('')}</div>`).join(''); }
+function pick(b){[...b.parentElement.children].forEach(c=>c.classList.remove('sel'));b.classList.add('sel');}
+function grade(qs){ let r=0; qs.forEach((it,i)=>{ const box=document.querySelector(`[data-q="${i}"]`); const sel=box.querySelector('.sel'); [...box.children].forEach(c=>{if(+c.dataset.i===it.a)c.classList.add('ok')}); if(sel){ if(+sel.dataset.i===it.a)r++; else sel.classList.add('bad'); } }); return r; }
+const DIAG=`<svg class="diag" viewBox="0 0 700 260"><rect width="700" height="260" fill="#fff"/><circle cx="200" cy="130" r="48" fill="#fff" stroke="#000" stroke-width="3"/><path d="M200 100l18 13-7 21h-22l-7-21z" fill="#000"/><path d="M150 95a60 60 0 0 1 80-25" fill="none" stroke="#000" stroke-width="3"/><path d="M232 66l-14-6 12-10z" fill="#000"/><text x="120" y="215" font-size="16" font-family="sans-serif" font-weight="700">SPIN</text><g stroke="#1e88e5" stroke-width="3" fill="none"><path d="M270 70c40-14 80-14 120 0"/><path d="M270 50c40-14 80-14 120 0"/></g><text x="270" y="38" font-size="15" font-family="sans-serif" fill="#1e88e5" font-weight="700">faster air → LOWER pressure</text><g stroke="#d7263d" stroke-width="3" fill="none"><path d="M270 190c40 14 80 14 120 0"/></g><text x="270" y="228" font-size="15" font-family="sans-serif" fill="#d7263d" font-weight="700">slower air → HIGHER pressure</text><path d="M330 170v-40h-12l20-22 20 22h-12v40z" fill="#1f7a4d"/><text x="365" y="150" font-size="15" font-family="sans-serif" font-weight="700">PUSH</text><path d="M250 125C380 90 480 60 620 70" stroke="#000" stroke-width="3" stroke-dasharray="8 7" fill="none"/><rect x="600" y="30" width="80" height="90" fill="none" stroke="#000" stroke-width="3"/><text x="520" y="110" font-size="15" font-family="sans-serif">the ball curves!</text></svg>`;
+
+// ---------- open station ----------
+let cur=null, st={};
+function open(s){ cur=s; st={}; $('vTitle').textContent=s.t; $('vTag').textContent=s.min+' min'; $('vFb').textContent=''; $('vCheck').disabled=false; $('vCheck').style.display='inline-block'; $('vCheck').textContent='Check my answers';
+ let h='';
+ if(s.type==='listen') h=`<div class="inst">Listen to the short talk (play it twice). Then answer.<i>Escucha dos veces y contesta.</i></div>${audioBtns(TALK)}${mc(LQ)}`;
+ else if(s.type==='read') h=`<div class="inst">Read the passage. Then answer the questions and complete the paragraph.<i>Lee el texto, contesta y completa el párrafo.</i></div><div class="pass">${PASSAGE}</div>${mc(RQ)}<div class="subq">Complete the paragraph · Tap a blank, then a word</div><div class="pass" id="cl">${CLOZE.text.replace(/\{(\d)\}/g,(m,i)=>`<span class="blank" data-b="${i}" onclick="btap(this)">______</span>`)}</div><div class="chips" id="bank">${shuffle(CLOZE.bank.slice()).map(w=>`<button class="chip" data-w="${w}" onclick="wtap(this)">${w}</button>`).join('')}</div>`;
+ else if(s.type==='arcade'){ h=`<div class="inst">Play all three. Your best score for each is saved.<i>Juega los tres.</i></div><div class="arc" id="arc"></div><div id="gameBox"></div>`; $('vCheck').style.display='none'; }
+ else if(s.type==='write'){ h=`<div class="inst"><b>Prompt:</b> Explain why a kicked soccer ball curves in the air. Use the words <b>spin</b>, <b>air</b>, and <b>pressure</b>. Write at least 6 sentences.<i>Explica por qué el balón curva. Usa spin, air y pressure. Mínimo 6 oraciones.</i></div>${DIAG}<div class="starters">${['A soccer ball curves because…','First, the player…','Then the ball…','On one side, the air…','On the other side,…','As a result,…','This is called…','In conclusion,…'].map(x=>`<button onclick="starter(this.textContent)">${x}</button>`).join('')}</div><textarea id="wr" placeholder="Write your paragraph here…">${esc(S.write?.text||'')}</textarea><div style="display:flex;justify-content:space-between;color:var(--muted);font-size:14px"><span id="wc">0 words · 0 sentences</span><span>Auto-graded on 5 rubric rows (0–4 each)</span></div><div id="rub"></div>`; $('vCheck').textContent='Grade my paragraph'; }
+ else if(s.type==='speak'){ h=`<div class="inst">Look at the diagram. Explain to a partner (or record) how the ball curves. Use <b>first, then, so</b>.<i>Explica el diagrama. Usa first, then, so.</i></div>${DIAG}<div class="chips">${['First, the player kicks…','Then the ball spins…','The air on top moves…','so the pressure…','The ball is pushed…','That is why…'].map(x=>`<span class="chip" style="background:#e8f0ff">${x}</span>`).join('')}</div><div class="rec"><button class="btn red" id="recBtn" onclick="toggleRec(45)">● Record 45 s</button><span class="time" id="recTime">0:45</span><audio id="recAudio" controls class="hidden"></audio></div><div class="check"><label><input type="checkbox" class="ck"> I explained all 5 steps</label><label><input type="checkbox" class="ck"> I used first / then / so</label><label><input type="checkbox" class="ck"> I said spin, air, and pressure</label><label><input type="checkbox" class="ck"> I spoke for most of the time</label></div>`; $('vCheck').textContent='Submit my speaking'; }
+ $('vBody').innerHTML=h; show('view');
+ if(s.type==='arcade') arcadeMenu();
+ if(s.type==='write'){ const ta=$('wr'); ta.oninput=()=>{const t=ta.value; $('wc').textContent=words(t).length+' words · '+sentences(t).length+' sentences';}; ta.oninput(); }
+}
+function btap(s){document.querySelectorAll('.blank').forEach(x=>x.classList.remove('active'));s.classList.add('active');st.active=s;}
+function wtap(c){const w=c.dataset.w;let s=st.active||document.querySelector('.blank:not(.filled)');if(!s)return;if(s.dataset.w){const old=document.querySelector(`#bank .chip[data-w="${s.dataset.w}"]`);if(old)old.classList.remove('used');}s.textContent=w;s.dataset.w=w;s.classList.add('filled');c.classList.add('used');s.classList.remove('active');st.active=document.querySelector('.blank:not(.filled)');if(st.active)st.active.classList.add('active');}
+function starter(t){const ta=$('wr');ta.value=(ta.value.trim()?ta.value.replace(/\s*$/,' '):'')+t+' ';ta.focus();ta.oninput();}
+
+// ---------- writing auto-grader ----------
+function words(t){return t.trim().split(/\s+/).filter(Boolean)}
+function sentences(t){return t.replace(/\s+/g,' ').split(/(?<=[.!?])\s+/).map(x=>x.trim()).filter(x=>x.length>2)}
+function gradeWriting(t){
+ const w=words(t), sn=sentences(t), low=t.toLowerCase();
+ const has=re=>re.test(low);
+ const vocab=[/\bspin/,/\bair\b/,/\bpressure/,/\b(curve|curves|curving|bend|bends|bending)\b/,/\bfaster\b/,/\bslower\b/,/\bmagnus\b/,/\b(push|pushes|pushed)\b/,/\boff-?center\b/,/\b(rotate|rotates|spinning)\b/].filter(has).length;
+ const link=[/\bfirst\b/,/\bthen\b/,/\bnext\b/,/\bfinally\b/,/\bbecause\b/,/\bso\b/,/\bwhen\b/,/\bas a result\b/,/\bfor example\b/,/\bthis means\b/,/\bin conclusion\b/,/\bon one side\b/,/\bon the other side\b/].filter(has).length;
+ const cause=(has(/faster/)&&has(/lower|drops|less/))+(has(/slower/)&&has(/higher|more|stays/))+(has(/push/)&&has(/toward|to the|low/))+(has(/off-?center|rotate|spin/)&&has(/because|when|so|makes/));
+ const caps=sn.filter(x=>/^[A-Z"]/.test(x)).length, ends=sn.filter(x=>/[.!?]$/.test(x)).length, lowI=(t.match(/\bi\b/g)||[]).length;
+ const conv=sn.length?((caps+ends)/(2*sn.length)):0;
+ const topic=sn[0]&&/(curve|bend|spin|why)/i.test(sn[0]); const close=sn.length>=4&&/(in conclusion|that is why|this is why|so,? the ball|finally|magnus)/i.test(sn[sn.length-1]);
+ const R=[
+  {k:'Ideas & science (cause → effect)',s:cause>=4?4:cause>=3?3:cause>=2?2:cause>=1?1:0,tip:'Explain each link: spin → faster air → lower pressure → push → curve.'},
+  {k:'Science vocabulary',s:vocab>=6?4:vocab>=4?3:vocab>=3?2:vocab>=1?1:0,tip:'Use spin, air, pressure, faster/slower, push, curve, Magnus effect.',det:vocab+' key words'},
+  {k:'Organization & linking words',s:(link>=4&&topic?4:link>=3?3:link>=2?2:link>=1?1:0)+(close&&link<4?0:0),tip:'Start with a topic sentence; use first, then, so, because, as a result; end with a closing sentence.',det:link+' linking words'+(topic?', topic sentence ✓':', no topic sentence')+(close?', closing ✓':'')},
+  {k:'Length & development',s:(w.length>=80&&sn.length>=6)?4:(w.length>=55&&sn.length>=5)?3:(w.length>=35&&sn.length>=3)?2:w.length>=15?1:0,tip:'Aim for 6+ sentences and 80+ words with an example (a free kick).',det:w.length+' words, '+sn.length+' sentences'},
+  {k:'Conventions (capitals, periods, spelling)',s:conv>=.95&&!lowI?4:conv>=.8?3:conv>=.6?2:conv>0?1:0,tip:'Every sentence: capital letter at the start, period at the end, capital "I".',det:Math.round(conv*100)+'% sentences correct'+(lowI?', lowercase "i" found':'')}
+ ];
+ R[2].s=Math.min(4,R[2].s+(close?1:0)+(topic&&R[2].s<4?0:0));
+ const tot=R.reduce((a,r)=>a+r.s,0);
+ const lvl=tot>=18?'Level 5 · Advanced':tot>=14?'Level 4 · Early Advanced':tot>=10?'Level 3 · Intermediate':tot>=6?'Level 2 · Early Intermediate':'Level 1 · Beginning';
+ return {R,tot,lvl};
+}
+
+// ---------- arcade ----------
+let gt=null;
+function stopGame(){ if(gt){clearInterval(gt);gt=null;} }
+const GAMES=[{id:'whack',n:'🔨 Whack-a-Word',d:'Read the meaning, tap the word. 45 s.'},{id:'tf',n:'🏐 True/False Volley',d:'10 statements, 5 s each.'},{id:'seq',n:'⏱ Sequence Sprint',d:'Order the 5 steps as fast as you can.'}];
+function arcadeMenu(){ stopGame(); const a=$('arc'); a.innerHTML=''; GAMES.forEach(g=>{ const b=document.createElement('button'); b.className='ag'; b.innerHTML=`<b>${g.n}</b><small>${g.d}</small><span class="best">Best: ${(S.arcade?.g?.[g.id])||0}</span>`; b.onclick=()=>startGame(g.id); a.appendChild(b); }); $('gameBox').innerHTML=''; }
+function arcSave(id,score){ S.arcade=S.arcade||{pts:0,g:{}}; S.arcade.g[id]=Math.max(S.arcade.g[id]||0,score); S.arcade.pts=Object.values(S.arcade.g).reduce((a,b)=>a+b,0); save(); }
+function startGame(id){
+ stopGame(); const box=$('gameBox'); $('arc').innerHTML='';
+ if(id==='whack'){
+  let score=0,t=45,target=null,pool=shuffle(WORDS.slice()); const cells=9;
+  box.innerHTML=`<div class="bar"><div class="big" id="gs">0</div><div class="tm"><i id="gb"></i></div><div class="big" id="gtm">45</div></div><div class="stmt" id="def"></div><div class="grid" id="grid">${Array.from({length:cells},(_,i)=>`<button class="mole" data-i="${i}"></button>`).join('')}</div><div class="actions"><button class="btn navy" onclick="arcadeMenu()">← Games</button></div>`;
+  const grid=$('grid');
+  function round(){ if(!document.body.contains(grid))return; const pick=shuffle(WORDS.slice()).slice(0,cells); target=pick[Math.floor(Math.random()*cells)]; $('def').textContent=target[1]; [...grid.children].forEach((c,i)=>{c.textContent=pick[i][0];c.className='mole pop';}); }
+  grid.onclick=e=>{ const c=e.target.closest('.mole'); if(!c||t<=0)return; if(c.textContent===target[0]){score+=10;c.classList.add('hit');sfx.ok();} else {score=Math.max(0,score-3);c.classList.add('miss');sfx.bad();} $('gs').textContent=score; setTimeout(round,250); };
+  round(); gt=setInterval(()=>{if(!document.body.contains(grid)){stopGame();return;}t--;$('gtm').textContent=t;$('gb').style.width=(t/45*100)+'%';if(t<=0){stopGame();arcSave('whack',score);$('def').textContent='Time! Score: '+score;sfx.win();[...grid.children].forEach(c=>c.className='mole');}},1000);
+ }
+ if(id==='tf'){
+  let i=0,score=0,t=5,items=shuffle(TF.slice());
+  box.innerHTML=`<div class="bar"><div class="big" id="gs">0</div><div class="tm"><i id="gb"></i></div><div class="big" id="gtm">5</div></div><div class="stmt" id="stmt"></div><div class="tf"><button class="btn" style="background:#d8f3e3" onclick="tfA(true)">✔ TRUE</button><button class="btn" style="background:#fde2e4" onclick="tfA(false)">✘ FALSE</button></div><div class="fb" id="tffb"></div><div class="actions"><button class="btn navy" onclick="arcadeMenu()">← Games</button></div>`;
+  function next(){ if(!$('stmt'))return; if(i>=items.length){stopGame();$('stmt').textContent='Done! Score: '+score+' / 100';arcSave('tf',score);sfx.win();return;} t=5; $('stmt').textContent=items[i][0]; $('gtm').textContent=t; $('gb').style.width='100%'; $('tffb').textContent=''; stopGame(); gt=setInterval(()=>{if(!$('stmt')){stopGame();return;}t--;$('gtm').textContent=t;$('gb').style.width=(t/5*100)+'%';if(t<=0){$('tffb').textContent='⏰ Too slow! It was '+(items[i][1]?'TRUE':'FALSE');sfx.bad();i++;setTimeout(next,900);}},1000); }
+  window.tfA=v=>{ if(i>=items.length||!gt)return; stopGame(); if(v===items[i][1]){score+=10;$('tffb').textContent='✅ +10';sfx.ok();} else {$('tffb').textContent='❌ It was '+(items[i][1]?'TRUE':'FALSE');sfx.bad();} $('gs').textContent=score; i++; setTimeout(next,800); };
+  next();
+ }
+ if(id==='seq'){
+  let order=shuffle(STEPS.map((_,i)=>i)),t=0; st.order=order;
+  box.innerHTML=`<div class="bar"><div class="big">Time: <span id="gtm">0</span>s</div></div><div class="ordlist" id="ord"></div><div class="actions"><button class="btn" id="seqCheck">Check order</button><button class="btn navy" onclick="arcadeMenu()">← Games</button></div><div class="fb" id="seqfb"></div>`;
+  function render(){ $('ord').innerHTML=order.map((idx,pos)=>`<div class="ord" data-i="${idx}"><span class="n">${pos+1}</span><span>${STEPS[idx]}</span><span class="mv"><button onclick="seqMv(${pos},-1)">▲</button><button onclick="seqMv(${pos},1)">▼</button></span></div>`).join(''); }
+  window.seqMv=(p,d)=>{const n=p+d;if(n<0||n>=order.length)return;[order[p],order[n]]=[order[n],order[p]];render();};
+  render(); gt=setInterval(()=>{if(!$('gtm')){stopGame();return;}t++;$('gtm').textContent=t;},1000);
+  $('seqCheck').onclick=()=>{ let r=0; [...$('ord').children].forEach((el,pos)=>{const ok=+el.dataset.i===pos;el.classList.add(ok?'ok':'bad');if(ok)r++;}); if(r===5){stopGame();const sc=Math.max(20,100-t);$('seqfb').textContent=`Perfect in ${t}s! Score: ${sc}`;arcSave('seq',sc);sfx.win();$('seqCheck').disabled=true;} else {$('seqfb').textContent=r+' / 5 in place — fix the red ones (time keeps running).';sfx.bad();setTimeout(()=>$('ord')&&[...$('ord').children].forEach(el=>el.classList.remove('ok','bad')),900);} };
+ }
+}
+
+// ---------- speaking rec ----------
+let mrec=null,chunks=[],rt=null,rl=0;
+async function toggleRec(secs){ const b=$('recBtn'); if(mrec&&mrec.state==='recording'){stopRec();return;} if(!navigator.mediaDevices||!window.MediaRecorder){$('vFb').textContent='Recording not available here — explain to a partner instead.';return;}
+ try{const s=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];mrec=new MediaRecorder(s);mrec.ondataavailable=e=>chunks.push(e.data);mrec.onstop=()=>{s.getTracks().forEach(t=>t.stop());const a=$('recAudio');if(a){a.src=URL.createObjectURL(new Blob(chunks,{type:mrec.mimeType||'audio/webm'}));a.classList.remove('hidden');}st.rec=true;};mrec.start();rl=secs;b.textContent='■ Stop';tickR();rt=setInterval(()=>{rl--;tickR();if(rl<=0)stopRec();},1000);}catch(e){$('vFb').textContent='Microphone blocked — allow it in Chrome, or explain to a partner.';}}
+function tickR(){const t=$('recTime');if(t)t.textContent=Math.floor(rl/60)+':'+String(rl%60).padStart(2,'0');}
+function stopRec(){clearInterval(rt);rt=null;if(mrec&&mrec.state==='recording')mrec.stop();const b=$('recBtn');if(b)b.textContent='● Record again';}
+
+// ---------- check ----------
+$('vCheck').onclick=()=>{
+ const s=cur; let pts=0,msg='';
+ if(s.type==='listen'){const r=grade(LQ);pts=r*25;msg=`${r}/4 correct.`;S.listen={pts,r};}
+ else if(s.type==='read'){const r=grade(RQ);let c=0;document.querySelectorAll('.blank').forEach(b=>{const ok=b.dataset.w===CLOZE.ans[+b.dataset.b];b.classList.add(ok?'ok':'bad');if(ok)c++;else b.textContent=CLOZE.ans[+b.dataset.b];});pts=r*12+c*8;msg=`${r}/5 questions · ${c}/5 blanks.`;S.read={pts,r,c};}
+ else if(s.type==='write'){const t=$('wr').value;if(words(t).length<15){$('vFb').textContent='Write at least 15 words first.';return;}const g=gradeWriting(t);pts=g.tot*5;
+  $('rub').innerHTML=`<div style="margin:10px 0"><span class="lvl">${g.lvl}</span> &nbsp; <b>${g.tot} / 20</b></div><table class="rub"><tr><th>Rubric row</th><th>Score</th><th>Feedback</th></tr>${g.R.map(r=>`<tr><td><b>${r.k}</b>${r.det?'<br><small>'+r.det+'</small>':''}</td><td class="sc">${r.s}</td><td>${r.s>=4?'✅ Excellent.':r.tip}</td></tr>`).join('')}</table><p style="font-size:14px;color:var(--muted)">Scores are automatic (computer-checked). Your teacher gives the final grade. Revise and press Grade again to improve.</p>`;
+  msg=`Graded: ${g.tot}/20 · ${g.lvl}`; S.write={pts,tot:g.tot,lvl:g.lvl,text:t}; $('vCheck').disabled=false; save(); $('vFb').textContent='⭐ '+msg; return;}
+ else if(s.type==='speak'){const ck=[...document.querySelectorAll('.ck:checked')].length;if(!st.rec&&ck<2){$('vFb').textContent='Record first (or explain to a partner), then check at least 2 boxes.';return;}pts=40+ck*15;msg='Submitted. Record it in Snorkl for your teacher.';S.speak={pts,ck};}
+ save(); $('vFb').textContent='⭐ '+msg+` (+${pts} pts)`; $('vCheck').disabled=true; sfx.win();
+};
+
+// ---------- report ----------
+function showReport(){
+ const tot=Object.values(S).reduce((a,b)=>a+(b.pts||0),0);
+ const lines=[`WEDNESDAY · Bend It Like Science · Week 15`,`Date: ${new Date().toLocaleDateString()}`,`Time used: ${Math.floor((total-left)/60)} min`,``,
+  `1 Listening: ${S.listen?S.listen.r+'/4 ('+S.listen.pts+' pts)':'—'}`,
+  `2 Reading:   ${S.read?S.read.r+'/5 questions, '+S.read.c+'/5 blanks ('+S.read.pts+' pts)':'—'}`,
+  `3 Arcade:    ${S.arcade?'Whack '+(S.arcade.g.whack||0)+' · T/F '+(S.arcade.g.tf||0)+' · Sequence '+(S.arcade.g.seq||0)+' ('+S.arcade.pts+' pts)':'—'}`,
+  `4 Writing:   ${S.write?S.write.tot+'/20 · '+S.write.lvl+' ('+S.write.pts+' pts)':'—'}`,
+  `5 Speaking:  ${S.speak?S.speak.ck+'/4 self-check ('+S.speak.pts+' pts)':'—'}`,``,`TOTAL: ${tot} pts`,``,
+  S.write?'MY PARAGRAPH:\n'+S.write.text:''];
+ $('repTxt').textContent=lines.join('\n'); show('rep');
+}
+$('btnCopy').onclick=()=>{ if(navigator.clipboard) navigator.clipboard.writeText($('repTxt').textContent).then(()=>{$('btnCopy').textContent='Copied ✓';}); };
+hub(); drawClock();
+</script>
+</body>
+</html>
