@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Penalty Shootout · Storm Studio Week 15</title>
+<style>
+:root{--ink:#16181d;--navy:#10203d;--grass:#1f7a4d;--grass2:#2a9a62;--gold:#f2b705;--cream:#fbf8f1;--red:#d7263d;--muted:#5d6472}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0d2e1d;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink)}
+.app{max-width:980px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;color:#fff;flex-wrap:wrap}
+header h1{margin:0;font-size:22px;letter-spacing:.02em}
+header h1 span{color:var(--gold)}
+.stats{display:flex;gap:14px;font-weight:700;font-size:15px;flex-wrap:wrap}
+.stats div{background:rgba(255,255,255,.12);border-radius:999px;padding:4px 12px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 18px;font-weight:700;font-size:17px;min-height:48px}
+.btn{background:var(--gold);color:var(--ink)}
+.btn.sec{background:rgba(255,255,255,.15);color:#fff}
+.btn:active{transform:translateY(1px)}
+main{flex:1;padding:0 12px 20px}
+.card{background:var(--cream);border-radius:18px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.menu h2{margin:0 0 6px;font-size:28px;color:var(--navy)}
+.menu p{margin:0 0 14px;color:var(--muted);font-size:16px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.lv{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:120px}
+.lv b{font-size:18px}.lv small{color:var(--muted);font-size:14px}
+.lv .best{margin-top:auto;font-size:13px;color:var(--grass)}
+.toggle{display:flex;gap:8px;align-items:center;margin:14px 0 0;flex-wrap:wrap}
+.toggle label{font-size:15px;display:flex;align-items:center;gap:6px}
+#field{width:100%;height:auto;display:block;border-radius:14px;background:#2a9a62}
+.q{font-size:21px;font-weight:700;color:var(--navy);margin:0 0 4px;line-height:1.3}
+.q small{display:block;font-weight:400;font-size:15px;color:var(--muted);margin-top:4px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:10px}
+.opt{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px 14px;text-align:left;font-size:17px;font-weight:600;min-height:52px}
+.opt.right{background:#d8f3e3;border-color:var(--grass)}
+.opt.wrong{background:#fde2e4;border-color:var(--red)}
+.opt:disabled{opacity:.85;cursor:default}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.timer{height:10px;background:#e4e0d4;border-radius:999px;overflow:hidden;flex:1;min-width:120px}
+.timer i{display:block;height:100%;background:var(--grass);width:100%;transition:width .25s linear}
+.msg{font-size:18px;font-weight:700;color:var(--navy);min-height:26px;margin:8px 0}
+.shoot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.shoot button{background:#fff;border:2px dashed var(--ink);color:var(--ink);font-size:16px}
+.hearts{letter-spacing:2px}
+.result h2{font-size:30px;margin:0 0 6px;color:var(--navy)}
+.result .big{font-size:56px;font-weight:900;color:var(--grass);margin:6px 0}
+.hidden{display:none}
+.sr{position:absolute;left:-9999px}
+footer{color:rgba(255,255,255,.6);font-size:12px;text-align:center;padding:10px}
+@media (max-width:520px){.q{font-size:18px}header h1{font-size:18px}}
+/* ---- ELPA21 gallery ---- */
+.gbtn{width:100%;margin-top:14px;background:var(--navy);color:#fff;border-radius:14px;padding:14px;font-size:18px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.gbtn span{font-size:14px;opacity:.85;font-weight:500}
+.gal h2{margin:0 0 4px;font-size:26px;color:var(--navy)}
+.gal p.sub{margin:0 0 12px;color:var(--muted)}
+.dom{margin:14px 0 6px;font-weight:800;color:#fff;background:var(--navy);display:inline-block;padding:4px 12px;border-radius:999px;font-size:14px;letter-spacing:.04em}
+.dom.L{background:#6a3fb5}.dom.R{background:#1f7a4d}.dom.W{background:#b8551a}.dom.S{background:#c2185b}
+.tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.tk{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:4px;min-height:96px}
+.tk b{font-size:16px}.tk small{color:var(--muted)}.tk .done{color:var(--grass);font-weight:700;font-size:13px;margin-top:auto}
+.tk.ok{border-color:var(--grass);background:#f1fbf5}
+.tbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.tbar h2{margin:0;font-size:22px;color:var(--navy)}
+.inst{background:#fff8dc;border-left:5px solid var(--gold);padding:10px 12px;border-radius:8px;margin:8px 0;font-size:16px}
+.inst i{color:var(--muted);display:block;font-size:14px}
+.audio{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.audio .btn{background:#6a3fb5;color:#fff}
+.transcript{background:#fff;border:1px dashed #999;border-radius:10px;padding:10px;font-size:16px;line-height:1.5}
+.pass{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px;font-size:17px;line-height:1.6}
+.subq{font-weight:700;color:var(--navy);margin:12px 0 4px;font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.chip{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:8px 14px;font-weight:700;font-size:16px;min-height:42px}
+.chip.sel{background:var(--gold)}
+.chip.used{opacity:.35}
+.chip.ok{background:#d8f3e3;border-color:var(--grass)}.chip.bad{background:#fde2e4;border-color:var(--red)}
+.ordlist{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.ord{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px 12px;font-size:16px}
+.ord .n{width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.ord .mv{margin-left:auto;display:flex;gap:4px}
+.ord .mv button{padding:4px 10px;min-height:34px;font-size:16px;background:#eee}
+.ord.ok{border-color:var(--grass);background:#f1fbf5}.ord.bad{border-color:var(--red);background:#fff4f5}
+.mrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mcol{display:flex;flex-direction:column;gap:8px}
+.mi{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px;font-size:16px;text-align:left;min-height:48px}
+.mi.sel{background:var(--gold)}.mi.pair{background:#e8f0ff;border-color:#3b5bdb}.mi.ok{background:#d8f3e3;border-color:var(--grass)}.mi.bad{background:#fde2e4;border-color:var(--red)}
+table.tt{width:100%;border-collapse:collapse;background:#fff;font-size:16px}
+table.tt th,table.tt td{border:2px solid var(--ink);padding:8px;text-align:center}
+table.tt td:first-child{text-align:left;font-weight:600}
+table.tt td button{width:100%;min-height:40px;background:#f3f3f3;border-radius:8px;font-size:18px}
+table.tt td button.sel{background:var(--gold)}
+table.tt tr.ok td{background:#f1fbf5}table.tt tr.bad td{background:#fff4f5}
+.blank{display:inline-block;min-width:110px;border-bottom:3px solid var(--navy);padding:0 8px;font-weight:800;color:#3b5bdb;cursor:pointer;text-align:center;background:#f4f6ff;border-radius:6px 6px 0 0}
+.blank.active{background:#fff2b3}.blank.ok{color:var(--grass)}.blank.bad{color:var(--red)}
+textarea{width:100%;min-height:170px;font:inherit;font-size:17px;line-height:1.5;padding:12px;border:2px solid var(--ink);border-radius:12px;resize:vertical}
+.check{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.check label{display:flex;gap:8px;align-items:flex-start;font-size:16px;background:#fff;border-radius:10px;padding:8px 10px;border:1px solid #ccc}
+.check input{width:20px;height:20px;margin-top:2px}
+.starters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.starters button{background:#e8f0ff;color:var(--navy);padding:6px 10px;min-height:36px;font-size:14px;border-radius:999px}
+.rec{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.rec .btn{background:var(--red);color:#fff}
+.rec .btn.stop{background:var(--ink)}
+.rec .time{font-weight:800;font-size:20px;color:var(--navy);min-width:60px}
+#picture{width:100%;height:auto;border-radius:12px;border:2px solid var(--ink);background:#fff}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.c2{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:12px;font-size:16px}
+.c2 h4{margin:0 0 6px;font-size:18px;color:var(--navy)}
+.c2 ul{margin:0;padding-left:18px}
+.fb{margin-top:10px;font-size:17px;font-weight:700;color:var(--navy);min-height:24px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+@media (max-width:560px){.mrow,.cards2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <h1>⚽ PENALTY <span>SHOOTOUT</span> · Week 15</h1>
+  <div class="stats"><div id="sScore">Goals: 0</div><div id="sStreak">Streak: 0</div><div id="sLives" class="hearts">♥♥♥</div></div>
+</header>
+<main>
+  <!-- MENU -->
+  <section id="menu" class="card menu">
+    <h2>Soccer: The World's Game</h2>
+    <p>Answer a question → earn a shot → pick a corner → GOAL! &nbsp;·&nbsp; <i>Contesta → gana un tiro → elige la esquina → ¡GOL!</i></p>
+    <div class="levels" id="levels"></div>
+    <div class="toggle">
+      <label><input type="checkbox" id="optES" checked> Show Spanish help · <i>Ayuda en español</i></label>
+      <label><input type="checkbox" id="optTimer" checked> 20-second timer</label>
+      <label><input type="checkbox" id="optSound" checked> Sound</label>
+    </div>
+    <p style="margin-top:12px;font-size:14px">3 lives. Each wrong answer costs a life. A goal is worth 100 points; a streak of 3 gives a bonus. Beat your best score!</p>
+    <button class="gbtn" id="btnGallery">🎯 ELPA21 Gallery · Listening · Reading · Writing · Speaking <span id="galProg">0 / 11 tasks done</span></button>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery" class="card gal hidden">
+    <div class="tbar"><h2>🎯 ELPA21 Gallery</h2><button class="btn sec" id="btnGalBack" style="background:var(--navy)">← Arcade menu</button></div>
+    <p class="sub">Practice the four test domains with the week's soccer content. Earn a ⭐ for each task. &nbsp;<i>Practica los cuatro dominios. Gana una ⭐ por cada tarea.</i></p>
+    <div id="galList"></div>
+  </section>
+
+  <!-- TASK -->
+  <section id="task" class="card hidden">
+    <div class="tbar"><h2 id="tkTitle"></h2><span id="tkDom" class="dom"></span></div>
+    <div id="tkBody"></div>
+    <div class="fb" id="tkFb"></div>
+    <div class="actions"><button class="btn" id="tkCheck">Check my answers</button><button class="btn sec" id="tkBack" style="background:var(--navy)">← Gallery</button></div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="card hidden">
+    <div class="bar">
+      <div id="lvName" style="font-weight:800;color:var(--navy)"></div>
+      <div class="timer" aria-hidden="true"><i id="tbar"></i></div>
+      <div id="qCount" style="font-weight:700;color:var(--muted)"></div>
+    </div>
+    <svg id="field" viewBox="0 0 800 300" role="img" aria-label="Soccer goal">
+      <rect x="0" y="0" width="800" height="300" fill="#2a9a62"/>
+      <g stroke="#ffffff" stroke-opacity=".35" stroke-width="2" fill="none"><rect x="20" y="20" width="760" height="260" rx="4"/><rect x="200" y="20" width="400" height="140"/></g>
+      <!-- goal -->
+      <rect x="260" y="70" width="280" height="110" fill="#ffffff" fill-opacity=".2"/>
+      <g stroke="#fff" stroke-opacity=".5" stroke-width="1">
+        <path d="M260 90h280M260 110h280M260 130h280M260 150h280M260 170h280M280 70v110M300 70v110M320 70v110M340 70v110M360 70v110M380 70v110M400 70v110M420 70v110M440 70v110M460 70v110M480 70v110M500 70v110M520 70v110"/>
+      </g>
+      <rect x="254" y="64" width="292" height="8" fill="#fff"/><rect x="254" y="64" width="8" height="120" fill="#fff"/><rect x="538" y="64" width="8" height="120" fill="#fff"/>
+      <!-- keeper -->
+      <g id="keeper" transform="translate(400,140)">
+        <circle cx="0" cy="-30" r="12" fill="#f4c7a1"/>
+        <rect x="-16" y="-18" width="32" height="40" rx="8" fill="#f2b705"/>
+        <rect x="-34" y="-14" width="18" height="10" rx="5" fill="#f2b705"/><rect x="16" y="-14" width="18" height="10" rx="5" fill="#f2b705"/>
+        <rect x="-14" y="22" width="11" height="24" rx="4" fill="#10203d"/><rect x="3" y="22" width="11" height="24" rx="4" fill="#10203d"/>
+      </g>
+      <!-- ball -->
+      <g id="ball" transform="translate(400,262)">
+        <circle r="14" fill="#fff" stroke="#16181d" stroke-width="2"/>
+        <path d="M0-6l5 4-2 6h-6l-2-6z" fill="#16181d"/>
+      </g>
+      <text id="fieldMsg" x="400" y="245" text-anchor="middle" font-size="34" font-weight="900" fill="#fff" stroke="#10203d" stroke-width="1.5"></text>
+    </svg>
+    <div id="qBox" style="margin-top:12px">
+      <p class="q" id="qText"></p>
+      <div class="opts" id="opts"></div>
+    </div>
+    <div id="shootBox" class="hidden">
+      <div class="msg">✅ Correct! Pick a corner to shoot · <i>¡Correcto! Elige dónde tirar</i></div>
+      <div class="shoot">
+        <button data-dir="0">↖ Top left</button><button data-dir="1">↑ Middle</button><button data-dir="2">↗ Top right</button>
+      </div>
+    </div>
+    <div class="msg" id="msg"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn sec" id="btnNext" style="background:var(--navy);display:none">Next question →</button><button class="btn sec" id="btnQuit" style="background:#7a1f2b">Quit to menu</button></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="card result hidden">
+    <h2 id="rTitle">Full time!</h2>
+    <div class="big" id="rScore">0</div>
+    <p id="rLine" style="font-size:18px;margin:0 0 8px"></p>
+    <p id="rReview" style="font-size:15px;color:var(--muted);margin:0 0 14px"></p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="btnAgain">Play again</button><button class="btn sec" id="btnMenu" style="background:var(--navy)">Choose a level</button></div>
+  </section>
+</main>
+<footer>Storm Studio · Laurel High School · EL 9–12 · Week 15: Soccer, The World's Game</footer>
+</div>
+<div class="sr" aria-live="polite" id="live"></div>
+
+<script>
+// ---------- CONTENT ----------
+const LEVELS = [
+ {id:'words', name:'Level 1 · Key Words', es:'Palabras clave', desc:'English ↔ Spanish from Texts 1–2', items:[
+  q('What is "rule" in Spanish?','¿Qué es "rule" en español?',['regla','partido','club','gol'],0),
+  q('"Anfitrión" in English is…','',['host','match','team','fan'],0),
+  q('What does "compete" mean?','¿Qué significa "compete"?',['to play to win','to watch','to sleep','to pay'],0),
+  q('"Partido" in English is…','',['match','party','stadium','ball'],0),
+  q('"Global" means…','"Global" significa…',['around the whole world','in one town','very small','very old'],0),
+  q('What is "history" in Spanish?','',['historia','hora','historieta','hielo'],0),
+  q('"Association" is a word for a…','"Association" es una palabra para un…',['group of clubs working together','type of ball','goalkeeper','stadium'],0),
+  q('The goalkeeper is the player who…','El portero es el jugador que…',['can use hands','runs fastest','kicks penalties only','sits on the bench'],0),
+ ]},
+ {id:'text1', name:'Level 2 · Text 1', es:'Cómo el fútbol obtuvo sus reglas', desc:'How Soccer Got Its Rules', items:[
+  q('Where was cuju, an early kicking game, played?','¿Dónde se jugaba cuju?',['ancient China','England','Uruguay','the USA'],0),
+  q('Before 1863, what was the problem?','Antes de 1863, ¿cuál era el problema?',['Every town had different rules','There were no balls','Only kids played','Nobody liked soccer'],0),
+  q('What happened in London in 1863?','¿Qué pasó en Londres en 1863?',['Clubs wrote one set of rules','The first World Cup','FIFA was formed','Rugby was banned'],0),
+  q('What was the biggest new rule?','¿Cuál fue la regla más importante?',['No carrying the ball with your hands','Only 10 players','Two-hour games','White balls only'],0),
+  q('Clubs that wanted to carry the ball played…','Los clubes que querían llevar el balón jugaron…',['rugby','basketball','tennis','baseball'],0),
+  q('Where does the word "soccer" come from?','¿De dónde viene la palabra "soccer"?',['the word association','a player\'s name','the word sock','a city'],0),
+  q('When was FIFA formed?','¿Cuándo se formó la FIFA?',['1904','1863','1930','2026'],0),
+  q('Who hosted AND won the first World Cup in 1930?','¿Quién organizó y ganó el primer Mundial?',['Uruguay','England','China','Mexico'],0),
+  q('Central idea of Text 1?','¿Idea principal del Texto 1?',['Shared rules made a local game global','Rugby is better','China invented sports','Uruguay is the best team'],0),
+ ]},
+ {id:'text2', name:'Level 3 · Text 2', es:'Un torneo, tres países', desc:'One Tournament, Three Countries', items:[
+  q('How many countries hosted the 2026 World Cup?','¿Cuántos países fueron anfitriones en 2026?',['3','1','2','16'],0),
+  q('Which countries hosted in 2026?','¿Qué países fueron anfitriones?',['USA, Mexico, Canada','USA, Brazil, Canada','Mexico, Spain, USA','Canada, England, USA'],0),
+  q('How many teams competed in 2026?','¿Cuántos equipos compitieron?',['48','32','16','104'],0),
+  q('How many matches were played in 2026?','¿Cuántos partidos se jugaron?',['104','64','48','16'],0),
+  q('How many host cities were in the United States?','¿Cuántas ciudades anfitrionas en EE. UU.?',['11','3','2','16'],0),
+  q('Where was the opening match on June 11, 2026?','¿Dónde fue el partido inaugural?',['Estadio Azteca, Mexico City','MetLife Stadium','Atlanta','Houston'],0),
+  q('Mexico hosted the World Cup in 1970, 1986, and…','México fue anfitrión en 1970, 1986 y…',['2026','2022','1994','2010'],0),
+  q('Where was the final played on July 19?','¿Dónde se jugó la final?',['MetLife Stadium, New Jersey','Estadio Azteca','Dallas','Toronto'],0),
+  q('Why was 2026 special for Mississippi fans?','¿Por qué fue especial para Mississippi?',['Games were only a road trip away','Mississippi had a team','The final was in Jackson','Tickets were free'],0),
+ ]},
+ {id:'compare', name:'Level 4 · 2022 vs 2026', es:'Compara los Mundiales', desc:'Only 2022? Only 2026? BOTH?', items:[
+  q('32 teams','',['Only 2022','Only 2026','BOTH'],0),
+  q('48 teams','',['Only 2022','Only 2026','BOTH'],1),
+  q('A FIFA World Cup','',['Only 2022','Only 2026','BOTH'],2),
+  q('1 host country (Qatar)','',['Only 2022','Only 2026','BOTH'],0),
+  q('3 host countries','',['Only 2022','Only 2026','BOTH'],1),
+  q('Held every four years','',['Only 2022','Only 2026','BOTH'],2),
+  q('64 matches','',['Only 2022','Only 2026','BOTH'],0),
+  q('104 matches','',['Only 2022','Only 2026','BOTH'],1),
+  q('One final decides the champion','',['Only 2022','Only 2026','BOTH'],2),
+  q('Played in November–December','',['Only 2022','Only 2026','BOTH'],0),
+  q('Played in June–July','',['Only 2022','Only 2026','BOTH'],1),
+  q('90-minute matches','',['Only 2022','Only 2026','BOTH'],2),
+  q('16 host cities','',['Only 2022','Only 2026','BOTH'],1),
+  q('First World Cup in the Middle East','',['Only 2022','Only 2026','BOTH'],0),
+  q('A trophy for the winner','',['Only 2022','Only 2026','BOTH'],2),
+ ]},
+];
+function q(en,es,opts,ans){return {en,es,opts,ans}}
+
+// ---------- STATE ----------
+const $=id=>document.getElementById(id);
+let lvl=null, order=[], idx=0, score=0, streak=0, lives=3, timer=null, timeLeft=20, missed=[];
+const best=JSON.parse(safeGet('pk_best')||'{}');
+function safeGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function safeSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+
+// ---------- SOUND (tiny synth) ----------
+let actx=null;
+function beep(freq,dur,type='square',vol=.08){ if(!$('optSound').checked)return; try{ actx=actx||new (window.AudioContext||window.webkitAudioContext)(); const o=actx.createOscillator(),g=actx.createGain(); o.type=type;o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(actx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur);o.stop(actx.currentTime+dur);}catch(e){} }
+const sfx={ok:()=>{beep(660,.12);setTimeout(()=>beep(880,.15),120)}, bad:()=>beep(160,.3,'sawtooth'), goal:()=>{[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.18,'triangle',.1),i*110))}, save:()=>beep(220,.25,'sawtooth'), tick:()=>beep(1200,.04,'sine',.03)};
+
+// ---------- MENU ----------
+function renderMenu(){
+  const box=$('levels'); box.innerHTML='';
+  LEVELS.forEach(L=>{
+    const b=document.createElement('button'); b.className='lv';
+    b.innerHTML=`<b>${L.name}</b><span>${L.desc}</span><small>${L.es}</small><span class="best">Best: ${best[L.id]||0} pts</span>`;
+    b.onclick=()=>start(L); box.appendChild(b);
+  });
+  show('menu');
+}
+function show(id){['menu','game','result','gallery','task'].forEach(s=>$(s).classList.toggle('hidden',s!==id)); if(window.speechSynthesis) speechSynthesis.cancel(); if(typeof stopRec==='function') stopRec(true);}
+
+// ---------- GAME ----------
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function start(L){
+  lvl=L; order=shuffle(L.items.map((_,i)=>i)); idx=0; score=0; streak=0; lives=3; missed=[];
+  $('lvName').textContent=L.name; updateStats(); show('game'); ask();
+}
+function updateStats(){ $('sScore').textContent='Goals: '+score; $('sStreak').textContent='Streak: '+streak; $('sLives').textContent='♥'.repeat(lives)+'♡'.repeat(3-lives); }
+function ask(){
+  if(idx>=order.length || lives<=0) return finish();
+  const it=lvl.items[order[idx]];
+  $('qCount').textContent=`${idx+1} / ${order.length}`;
+  $('qText').innerHTML = esc(it.en) + (($('optES').checked && it.es)?`<small>${esc(it.es)}</small>`:'');
+  const opts=$('opts'); opts.innerHTML='';
+  const perm=shuffle(it.opts.map((o,i)=>({o,i})));
+  perm.forEach(p=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=p.o; b.onclick=()=>answer(b,p.i===it.ans,it); opts.appendChild(b); });
+  $('qBox').classList.remove('hidden'); $('shootBox').classList.add('hidden'); $('btnNext').style.display='none'; $('msg').textContent=''; $('fieldMsg').textContent='';
+  resetField(); startTimer();
+}
+function startTimer(){
+  stopTimer(); if(!$('optTimer').checked){ $('tbar').style.width='100%'; return; }
+  timeLeft=20; $('tbar').style.width='100%';
+  timer=setInterval(()=>{ timeLeft-=.25; $('tbar').style.width=(timeLeft/20*100)+'%'; if(timeLeft<=5 && Math.abs(timeLeft%1)<.01) sfx.tick(); if(timeLeft<=0){ stopTimer(); timeUp(); } },250);
+}
+function stopTimer(){ if(timer){clearInterval(timer);timer=null} }
+function lockOpts(){ [...$('opts').children].forEach(b=>b.disabled=true) }
+function timeUp(){ lockOpts(); const it=lvl.items[order[idx]]; markRight(it); loseLife('⏰ Time! · ¡Tiempo!', it); }
+function markRight(it){ [...$('opts').children].forEach(b=>{ if(b.textContent===it.opts[it.ans]) b.classList.add('right') }) }
+function answer(btn,correct,it){
+  stopTimer(); lockOpts();
+  if(correct){ btn.classList.add('right'); sfx.ok(); $('qBox').classList.add('hidden'); $('shootBox').classList.remove('hidden'); $('live').textContent='Correct. Pick a corner.'; }
+  else { btn.classList.add('wrong'); markRight(it); loseLife('❌ Not this time. The answer is: '+it.opts[it.ans], it); }
+}
+function loseLife(text,it){
+  sfx.bad(); lives--; streak=0; missed.push(it); updateStats(); $('msg').textContent=text; $('live').textContent=text;
+  $('btnNext').style.display='inline-block'; $('btnNext').textContent = lives>0 ? 'Next question →' : 'See results';
+}
+document.querySelectorAll('.shoot button').forEach(b=>b.onclick=()=>shoot(+b.dataset.dir));
+function shoot(dir){
+  $('shootBox').classList.add('hidden');
+  const dive=Math.random()<0.28 ? dir : [0,1,2].filter(d=>d!==dir)[Math.floor(Math.random()*2)];
+  const xs=[300,400,500], kx=[300,400,500];
+  const ball=$('ball'), keeper=$('keeper');
+  ball.style.transition='transform .55s cubic-bezier(.2,.8,.3,1)'; keeper.style.transition='transform .45s ease';
+  ball.setAttribute('transform',`translate(${xs[dir]},${dir===1?120:105})`); keeper.setAttribute('transform',`translate(${kx[dive]},140) rotate(${dive===0?-25:dive===2?25:0})`);
+  setTimeout(()=>{
+    const saved = dive===dir;
+    if(saved){ sfx.save(); $('fieldMsg').textContent='SAVED!'; $('msg').textContent='The keeper saved it — but you still earned 50 for the right answer. · ¡Atajada! +50'; score+=50; streak++; }
+    else { sfx.goal(); $('fieldMsg').textContent='GOAL!'; streak++; let pts=100; if(streak%3===0){pts+=50; $('msg').textContent='⚽ GOAL! +100 and a streak bonus +50 · ¡GOL! Racha x3';} else $('msg').textContent='⚽ GOAL! +100 · ¡GOL!'; score+=pts; }
+    updateStats(); $('btnNext').style.display='inline-block'; $('btnNext').textContent='Next question →'; $('live').textContent=$('msg').textContent;
+  },600);
+}
+function resetField(){ const ball=$('ball'), keeper=$('keeper'); ball.style.transition='none'; keeper.style.transition='none'; ball.setAttribute('transform','translate(400,262)'); keeper.setAttribute('transform','translate(400,140)'); }
+$('btnNext').onclick=()=>{ idx++; ask(); };
+$('btnQuit').onclick=()=>{ stopTimer(); renderMenu(); };
+function finish(){
+  stopTimer();
+  const total=order.length, answered=idx, max=total*100;
+  if(score>(best[lvl.id]||0)){ best[lvl.id]=score; safeSet('pk_best',JSON.stringify(best)); }
+  $('rTitle').textContent = lives>0 ? 'Full time! · ¡Final del partido!' : 'Out of lives · Sin vidas';
+  $('rScore').textContent=score+' pts';
+  const grade = score>=max*.8 ? '🏆 ¡Golazo! Champion level.' : score>=max*.5 ? '👏 Good work — strong player.' : '💪 Keep training. Reread the text and try again.';
+  $('rLine').textContent=`${grade}  (Best: ${best[lvl.id]} pts)`;
+  $('rReview').innerHTML = missed.length ? '<b>Review these · Repasa:</b> ' + missed.map(m=>`${esc(m.en)} → <b>${esc(m.opts[m.ans])}</b>`).join(' &nbsp;·&nbsp; ') : 'Perfect answers — no review needed!';
+  show('result');
+}
+$('btnAgain').onclick=()=>start(lvl); $('btnMenu').onclick=renderMenu;
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+renderMenu();
+</script>
+
+<script>
+// ================= ELPA21 GALLERY =================
+const PIC = `<svg id="picture" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A classroom: a teacher at a whiteboard with a soccer field diagram, four students at a table, one holding a soccer ball, a clock and a window">
+<rect width="800" height="420" fill="#f7f3ea"/><rect y="300" width="800" height="120" fill="#d9c4a0"/>
+<rect x="40" y="40" width="330" height="190" rx="6" fill="#fff" stroke="#333" stroke-width="4"/>
+<rect x="70" y="70" width="270" height="130" fill="#2a9a62" stroke="#fff" stroke-width="3"/><line x1="205" y1="70" x2="205" y2="200" stroke="#fff" stroke-width="3"/><circle cx="205" cy="135" r="25" fill="none" stroke="#fff" stroke-width="3"/>
+<circle cx="120" cy="110" r="7" fill="#f2b705"/><circle cx="150" cy="160" r="7" fill="#f2b705"/><circle cx="260" cy="100" r="7" fill="#d7263d"/><circle cx="290" cy="170" r="7" fill="#d7263d"/>
+<path d="M120 110 L150 160 L205 135" stroke="#fff" stroke-width="3" fill="none" stroke-dasharray="6 5"/>
+<text x="205" y="222" font-size="18" text-anchor="middle" font-family="sans-serif" fill="#333" font-weight="700">RULES: 1) No hands  2) 11 players</text>
+<rect x="560" y="50" width="190" height="130" fill="#bfe3ff" stroke="#333" stroke-width="4"/><line x1="655" y1="50" x2="655" y2="180" stroke="#333" stroke-width="4"/><circle cx="700" cy="85" r="18" fill="#ffe066"/>
+<circle cx="470" cy="90" r="34" fill="#fff" stroke="#333" stroke-width="4"/><line x1="470" y1="90" x2="470" y2="66" stroke="#333" stroke-width="4"/><line x1="470" y1="90" x2="488" y2="100" stroke="#333" stroke-width="4"/>
+<!-- teacher -->
+<circle cx="430" cy="190" r="22" fill="#8d5524"/><rect x="408" y="212" width="44" height="80" rx="10" fill="#10203d"/><line x1="408" y1="230" x2="360" y2="200" stroke="#8d5524" stroke-width="12" stroke-linecap="round"/><rect x="415" y="292" width="14" height="40" fill="#333"/><rect x="431" y="292" width="14" height="40" fill="#333"/>
+<!-- table -->
+<rect x="90" y="300" width="400" height="18" rx="4" fill="#8b5a2b"/><rect x="110" y="318" width="14" height="80" fill="#6b4420"/><rect x="466" y="318" width="14" height="80" fill="#6b4420"/>
+<rect x="150" y="280" width="60" height="22" rx="3" fill="#ddd" stroke="#333" stroke-width="2"/><rect x="160" y="262" width="40" height="18" fill="#444"/>
+<!-- students -->
+<g><circle cx="150" cy="250" r="18" fill="#f4c7a1"/><rect x="132" y="268" width="36" height="32" rx="8" fill="#d7263d"/></g>
+<g><circle cx="240" cy="250" r="18" fill="#c68642"/><rect x="222" y="268" width="36" height="32" rx="8" fill="#f2b705"/><rect x="226" y="286" width="28" height="18" fill="#fff" stroke="#333" stroke-width="2"/></g>
+<g><circle cx="330" cy="250" r="18" fill="#8d5524"/><rect x="312" y="268" width="36" height="32" rx="8" fill="#1f7a4d"/></g>
+<g><circle cx="420" cy="258" r="18" fill="#f4c7a1"/><rect x="402" y="276" width="36" height="26" rx="8" fill="#3b5bdb"/><circle cx="455" cy="286" r="14" fill="#fff" stroke="#333" stroke-width="3"/><path d="M455 278l5 4-2 6h-6l-2-6z" fill="#333"/></g>
+<text x="600" y="250" font-size="16" font-family="sans-serif" fill="#333">Thursday · Soccer Unit</text>
+</svg>`;
+
+const T2026=['48 teams','3 host countries (USA, Mexico, Canada)','104 matches','16 host cities','Played in June–July','Opening match at Estadio Azteca'];
+const T2022=['32 teams','1 host country (Qatar)','64 matches','8 stadiums in one country','Played in November–December','First World Cup in the Middle East'];
+
+const TASKS=[
+ {id:'L1',dom:'L',title:'Listen: The Coach\'s Announcement',sub:'Listen to a short announcement · 4 questions',type:'listen',
+  audio:"Good morning, Storm soccer players. Practice today is moved to four thirty because the field is wet. Please bring your water bottle and your blue practice jersey. Remember, Friday's game starts at seven at the home stadium, and the bus leaves school at five fifteen.",
+  qs:[{q:'What time is practice today?',o:['4:30','3:30','5:15'],a:0},{q:'Why was practice moved?',o:['The field is wet','The coach is sick','It is a holiday'],a:0},{q:'What should players bring?',o:['Water bottle and blue jersey','Homework and a pencil','Lunch money'],a:0},{q:'When does the bus leave on Friday?',o:['5:15','7:00','4:30'],a:0}]},
+ {id:'L2',dom:'L',title:'Listen: A Short Talk about 2026',sub:'Listen to a short talk · 4 questions',type:'listen',
+  audio:"In twenty twenty-six, three countries hosted the World Cup together for the first time: the United States, Mexico, and Canada. Forty-eight teams played one hundred four matches in sixteen cities. The opening match was at Estadio Azteca in Mexico City on June eleventh, and the final was at MetLife Stadium near New York on July nineteenth.",
+  qs:[{q:'How many countries hosted together?',o:['Three','One','Sixteen'],a:0},{q:'How many matches were played?',o:['104','48','64'],a:0},{q:'Where was the opening match?',o:['Estadio Azteca, Mexico City','MetLife Stadium','Toronto'],a:0},{q:'The speaker\'s main purpose is to…',o:['give facts about the 2026 World Cup','sell tickets','describe a famous player'],a:0}]},
+ {id:'L3',dom:'L',title:'Listen & Put in Order',sub:'Hear the story, then order the 4 events',type:'order',
+  audio:"Here is how soccer got its rules. First, long ago, people in China kicked a ball in a game called cuju. Later, in England, every town played with its own rules. Then, in eighteen sixty-three, clubs met in London and wrote one set of rules. Finally, FIFA was formed in nineteen oh four, and the first World Cup was played in nineteen thirty.",
+  items:['Long ago, people in China kicked a ball in a game called cuju.','In England, every town played with its own rules.','In 1863, clubs met in London and wrote one set of rules.','FIFA was formed in 1904, and the first World Cup was played in 1930.']},
+ {id:'R1',dom:'R',title:'Match Words and Meanings',sub:'Tap a word, then tap its meaning',type:'match',
+  pairs:[['host','the country where the tournament is played'],['association','a group of clubs that work together'],['compete','to play and try to win'],['tournament','many matches that end with one champion'],['afford','to have enough money to pay for something']]},
+ {id:'R2',dom:'R',title:'Read: Find the Supporting Detail',sub:'Read a paragraph · 3 questions',type:'passage',
+  passage:'Shared rules turned a local game into a global sport. Before 1863, each English town played its own way, so teams from different towns could not play each other fairly. After the London clubs agreed on one set of rules, teams from different cities could finally compete. Soon the rules traveled with sailors and workers to South America and beyond.',
+  qs:[{q:'Which sentence BEST supports the main idea?',o:['After the London clubs agreed on one set of rules, teams from different cities could finally compete.','Before 1863, each English town played its own way.','Soon the rules traveled with sailors and workers.'],a:0},{q:'What does "global" mean in this paragraph?',o:['around the whole world','only in England','very old'],a:0},{q:'Why could towns NOT play each other fairly before 1863?',o:['Each town had different rules','There were no balls','It was too far to travel'],a:0}]},
+ {id:'R3',dom:'R',title:'Sort to the Table: 2022 or 2026?',sub:'Tap one box in each row',type:'table',
+  rows:[['32 teams',0],['Three host countries',1],['A FIFA World Cup',2],['104 matches',1],['Played in November–December',0],['90-minute matches',2],['First World Cup in the Middle East',0],['16 host cities',1]],cols:['Only 2022','Only 2026','Both']},
+ {id:'W1',dom:'W',title:'Complete the Paragraph',sub:'Tap a blank, then tap a word',type:'cloze',
+  text:'In 2026, three {0} shared one tournament. Forty-eight {1} competed in 104 {2}. The opening {3} was at Estadio Azteca, and the {4} was played at MetLife Stadium.',
+  answers:['countries','teams','matches','match','final'],bank:['countries','teams','matches','match','final','players','rules']},
+ {id:'W2',dom:'W',title:'Edit the Sentences',sub:'Choose the correct word for each sentence',type:'edit',
+  qs:[{q:'In 1863, the clubs ___ one set of rules.',o:['wrote','write','writing'],a:0},{q:'Uruguay ___ the first World Cup in 1930.',o:['won','win','wins'],a:0},{q:'Today, soccer ___ played in almost every country.',o:['is','are','be'],a:0},{q:'Fans from Mississippi ___ drive to Houston or Atlanta in 2026.',o:['could','can\'t','couldn\'t'],a:0},{q:'The 2026 tournament had ___ teams than 2022.',o:['more','most','much'],a:0}]},
+ {id:'W3',dom:'W',title:'Write Your Opinion',sub:'Write a paragraph · self-check rubric',type:'write',
+  prompt:'Is it better for ONE country or THREE countries to host the World Cup? Give your opinion and TWO reasons. Use details from this week\'s texts.',
+  es:'¿Es mejor que un país o tres países organicen el Mundial? Da tu opinión y dos razones.',
+  starters:['In my opinion, it is better when…','One reason is that…','Another reason is…','For example, in 2026…','However, some people think…','In conclusion,…'],
+  check:['I stated my opinion clearly in the first sentence','I gave reason 1 with a detail from the text','I gave reason 2 with a detail from the text','I used linking words (because, also, however, for example)','I wrote a closing sentence','I checked capital letters and periods'],min:60},
+ {id:'S1',dom:'S',title:'Speak: Describe the Picture',sub:'Record 45 seconds · Who? Where? What?',type:'speak',pic:true,
+  prompt:'Look at the picture. Describe what you see. Who is there? Where are they? What are they doing? Say at least 5 sentences.',
+  es:'Describe la imagen: ¿quiénes? ¿dónde? ¿qué hacen? Di al menos 5 oraciones.',
+  tips:['I see…','There is / There are…','The teacher is…','The students are…','On the board…','I think they are learning about…'],secs:45},
+ {id:'S2',dom:'S',title:'Speak: Compare Two World Cups',sub:'Record 60 seconds · same & different',type:'speak',compare:true,
+  prompt:'Compare the 2022 and 2026 World Cups. Tell two ways they are the same and two ways they are different.',
+  es:'Compara los Mundiales de 2022 y 2026: dos semejanzas y dos diferencias.',
+  tips:['Both tournaments…','In 2022… but in 2026…','One difference is…','While 2022 had…, 2026 had…','They are the same because…'],secs:60}
+];
+const gal=JSON.parse(safeGet('pk_gal')||'{}');
+let curT=null, tstate={};
+
+function renderGallery(){
+  const box=$('galList'); box.innerHTML='';
+  const names={L:'🎧 Listening',R:'📖 Reading',W:'✏️ Writing',S:'🎤 Speaking'};
+  ['L','R','W','S'].forEach(d=>{
+    const h=document.createElement('div'); h.className='dom '+d; h.textContent=names[d]; box.appendChild(h);
+    const g=document.createElement('div'); g.className='tasks';
+    TASKS.filter(t=>t.dom===d).forEach(t=>{
+      const b=document.createElement('button'); b.className='tk'+(gal[t.id]?' ok':'');
+      b.innerHTML=`<b>${esc(t.title)}</b><small>${esc(t.sub)}</small><span class="done">${gal[t.id]?'⭐ Done · '+gal[t.id]+' pts':'Not started'}</span>`;
+      b.onclick=()=>openTask(t); g.appendChild(b);
+    });
+    box.appendChild(g);
+  });
+  $('galProg').textContent=Object.keys(gal).length+' / '+TASKS.length+' tasks done';
+  show('gallery');
+}
+$('btnGallery').onclick=renderGallery; $('btnGalBack').onclick=renderMenu; $('tkBack').onclick=renderGallery;
+
+// ---- speech ----
+function speakBtns(text){
+  return `<div class="audio"><button class="btn" onclick="say(this.dataset.t)" data-t="${esc(text).replace(/"/g,'&quot;')}">▶ Play audio</button><button class="btn sec" style="background:#444" onclick="say(this.previousElementSibling.dataset.t,0.75)">🐢 Slower</button><button class="btn sec" style="background:#777" onclick="if(window.speechSynthesis)speechSynthesis.cancel()">■ Stop</button><button class="btn sec" style="background:#999" onclick="const t=document.getElementById('tr');t.classList.toggle('hidden')">Show text</button></div><div id="tr" class="transcript hidden">${esc(text)}</div>`;
+}
+function say(text,rate=0.92){
+  if(!window.speechSynthesis){ $('tkFb').textContent='This browser cannot read aloud — tap "Show text" instead.'; return; }
+  speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=rate;
+  const v=speechSynthesis.getVoices().find(v=>/en-US/i.test(v.lang)&&/Google|Samantha|Natural/i.test(v.name))||speechSynthesis.getVoices().find(v=>/en/i.test(v.lang)); if(v)u.voice=v;
+  speechSynthesis.speak(u);
+}
+if(window.speechSynthesis) speechSynthesis.getVoices();
+
+function mcBlock(qs,prefix){
+  return qs.map((it,i)=>`<div class="subq">${i+1}. ${esc(it.q)}</div><div class="chips" data-q="${prefix}${i}">${it.o.map((o,j)=>`<button class="chip" data-i="${j}" onclick="pick(this)">${esc(o)}</button>`).join('')}</div>`).join('');
+}
+function pick(b){ [...b.parentElement.children].forEach(c=>c.classList.remove('sel')); b.classList.add('sel'); }
+function gradeMC(qs,prefix){
+  let right=0;
+  qs.forEach((it,i)=>{ const box=document.querySelector(`[data-q="${prefix}${i}"]`); const sel=box.querySelector('.sel'); [...box.children].forEach(c=>{ if(+c.dataset.i===it.a) c.classList.add('ok'); }); if(sel){ if(+sel.dataset.i===it.a) right++; else sel.classList.add('bad'); } });
+  return right;
+}
+
+function openTask(t){
+  curT=t; tstate={}; $('tkTitle').textContent=t.title; const d=$('tkDom'); d.className='dom '+t.dom; d.textContent={L:'Listening',R:'Reading',W:'Writing',S:'Speaking'}[t.dom];
+  $('tkFb').textContent=''; $('tkCheck').style.display='inline-block'; $('tkCheck').textContent='Check my answers'; $('tkCheck').disabled=false;
+  let h='';
+  if(t.type==='listen'){ h=`<div class="inst">Listen to the audio. You may play it twice. Then answer the questions.<i>Escucha el audio (puedes repetirlo dos veces) y contesta.</i></div>${speakBtns(t.audio)}${mcBlock(t.qs,'q')}`; }
+  else if(t.type==='order'){ tstate.order=shuffle(t.items.map((_,i)=>i)); h=`<div class="inst">Listen. Then put the events in the correct order (1 → 4). Use the arrows.<i>Escucha y ordena los eventos con las flechas.</i></div>${speakBtns(t.audio)}<div class="ordlist" id="ord"></div>`; }
+  else if(t.type==='match'){ tstate.sel=null; tstate.pairs={}; const L=t.pairs.map((p,i)=>({t:p[0],i})); const R=shuffle(t.pairs.map((p,i)=>({t:p[1],i}))); h=`<div class="inst">Tap a word, then tap its meaning. Tap a pair again to undo.<i>Toca una palabra y luego su significado.</i></div><div class="mrow"><div class="mcol">${L.map(x=>`<button class="mi" data-side="l" data-i="${x.i}" onclick="mtap(this)">${esc(x.t)}</button>`).join('')}</div><div class="mcol">${R.map(x=>`<button class="mi" data-side="r" data-i="${x.i}" onclick="mtap(this)">${esc(x.t)}</button>`).join('')}</div></div>`; }
+  else if(t.type==='passage'){ h=`<div class="inst">Read the paragraph. Then answer the questions.<i>Lee el párrafo y contesta.</i></div><div class="pass">${esc(t.passage)}</div>${mcBlock(t.qs,'q')}`; }
+  else if(t.type==='table'){ h=`<div class="inst">Read each fact. Tap ONE box: Only 2022, Only 2026, or Both.<i>Toca una casilla por fila.</i></div><table class="tt"><tr><th>Fact</th>${t.cols.map(c=>`<th>${c}</th>`).join('')}</tr>${t.rows.map((r,i)=>`<tr data-r="${i}"><td>${esc(r[0])}</td>${t.cols.map((c,j)=>`<td><button data-c="${j}" onclick="ttap(this)">○</button></td>`).join('')}</tr>`).join('')}</table>`; }
+  else if(t.type==='cloze'){ tstate.fill={}; tstate.active=null; const parts=t.text.split(/\{(\d)\}/); let p=''; parts.forEach((s,i)=>{ if(i%2===0) p+=esc(s); else p+=`<span class="blank" data-b="${s}" onclick="btap(this)">______</span>`; }); h=`<div class="inst">Tap a blank, then tap the word that fits. Two words are extra.<i>Toca un espacio y luego la palabra correcta. Hay dos palabras extra.</i></div><div class="pass" id="cloze">${p}</div><div class="chips" id="bank">${shuffle(t.bank.slice()).map(w=>`<button class="chip" data-w="${esc(w)}" onclick="wtap(this)">${esc(w)}</button>`).join('')}</div>`; }
+  else if(t.type==='edit'){ h=`<div class="inst">Choose the word that makes each sentence correct.<i>Elige la palabra correcta.</i></div>${mcBlock(t.qs,'q')}`; }
+  else if(t.type==='write'){ h=`<div class="inst">${esc(t.prompt)}<i>${esc(t.es)}</i></div><div class="starters">${t.starters.map(s=>`<button onclick="addStarter(this.textContent)">${esc(s)}</button>`).join('')}</div><textarea id="wr" placeholder="Write here… (at least ${t.min} words)"></textarea><div style="display:flex;justify-content:space-between;font-size:14px;color:var(--muted)"><span id="wc">0 words</span><button class="btn sec" style="background:#777;min-height:34px;padding:6px 12px;font-size:14px" onclick="copyWriting()">Copy my paragraph</button></div><div class="subq">Self-check · Autoevaluación</div><div class="check">${t.check.map((c,i)=>`<label><input type="checkbox" class="ck"> ${esc(c)}</label>`).join('')}</div>`; $('tkCheck').textContent='Submit my writing'; }
+  else if(t.type==='speak'){ h=`<div class="inst">${esc(t.prompt)}<i>${esc(t.es)}</i></div>${t.pic?PIC:''}${t.compare?`<div class="cards2"><div class="c2"><h4>2022 · Qatar</h4><ul>${T2022.map(x=>`<li>${x}</li>`).join('')}</ul></div><div class="c2"><h4>2026 · USA · Mexico · Canada</h4><ul>${T2026.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>`:''}<div class="subq">Sentence starters</div><div class="chips">${t.tips.map(s=>`<span class="chip" style="font-weight:600;background:#e8f0ff">${esc(s)}</span>`).join('')}</div><div class="rec"><button class="btn" id="recBtn" onclick="toggleRec(${t.secs})">● Record</button><span class="time" id="recTime">0:${String(t.secs).padStart(2,'0')}</span><audio id="recAudio" controls class="hidden" style="max-width:100%"></audio></div><div class="subq">Self-check · Autoevaluación</div><div class="check"><label><input type="checkbox" class="ck"> I spoke for most of the time</label><label><input type="checkbox" class="ck"> I used complete sentences</label><label><input type="checkbox" class="ck"> I used at least 3 key words from this week</label><label><input type="checkbox" class="ck"> I listened to my recording</label></div>`; $('tkCheck').textContent='Submit my speaking'; }
+  $('tkBody').innerHTML=h;
+  if(t.type==='order') renderOrder();
+  if(t.type==='write'){ const ta=$('wr'); ta.oninput=()=>{ $('wc').textContent=ta.value.trim().split(/\s+/).filter(Boolean).length+' words'; }; }
+  show('task');
+}
+
+// order
+function renderOrder(){ const box=$('ord'); box.innerHTML=tstate.order.map((idx,pos)=>`<div class="ord" data-i="${idx}"><span class="n">${pos+1}</span><span>${esc(curT.items[idx])}</span><span class="mv"><button onclick="mv(${pos},-1)" aria-label="Move up">▲</button><button onclick="mv(${pos},1)" aria-label="Move down">▼</button></span></div>`).join(''); }
+function mv(pos,d){ const n=pos+d; if(n<0||n>=tstate.order.length)return; [tstate.order[pos],tstate.order[n]]=[tstate.order[n],tstate.order[pos]]; renderOrder(); }
+// match
+function mtap(b){
+  if(b.classList.contains('pair')){ const i=b.dataset.i; document.querySelectorAll(`.mi[data-i="${i}"]`).forEach(x=>x.classList.remove('pair')); delete tstate.pairs[i]; return; }
+  if(!tstate.sel){ tstate.sel=b; b.classList.add('sel'); return; }
+  if(tstate.sel===b){ b.classList.remove('sel'); tstate.sel=null; return; }
+  if(tstate.sel.dataset.side===b.dataset.side){ tstate.sel.classList.remove('sel'); tstate.sel=b; b.classList.add('sel'); return; }
+  const l=tstate.sel.dataset.side==='l'?tstate.sel:b, r=l===b?tstate.sel:b;
+  tstate.pairs[l.dataset.i]=r.dataset.i; [l,r].forEach(x=>{x.classList.remove('sel');x.classList.add('pair')}); tstate.sel=null;
+}
+// table
+function ttap(b){ [...b.closest('tr').querySelectorAll('button')].forEach(x=>{x.classList.remove('sel');x.textContent='○'}); b.classList.add('sel'); b.textContent='●'; }
+// cloze
+function btap(s){ document.querySelectorAll('.blank').forEach(x=>x.classList.remove('active')); s.classList.add('active'); tstate.active=s; }
+function wtap(c){ const w=c.dataset.w; let s=tstate.active||document.querySelector('.blank:not(.filled)'); if(!s)return; if(s.dataset.w){ const old=document.querySelector(`#bank .chip[data-w="${s.dataset.w}"]`); if(old)old.classList.remove('used'); } s.textContent=w; s.dataset.w=w; s.classList.add('filled'); c.classList.add('used'); s.classList.remove('active'); tstate.active=document.querySelector('.blank:not(.filled)'); if(tstate.active)tstate.active.classList.add('active'); }
+// write
+function addStarter(s){ const ta=$('wr'); ta.value=(ta.value.trim()?ta.value.replace(/\s*$/,' '):'')+s+' '; ta.focus(); ta.dispatchEvent(new Event('input')); }
+function copyWriting(){ const v=$('wr').value; if(navigator.clipboard) navigator.clipboard.writeText(v).then(()=>$('tkFb').textContent='Copied! Paste it into Snorkl, Google Docs, or Classroom.'); }
+// speaking (MediaRecorder)
+let mrec=null, chunks=[], recTimer=null, recLeft=0;
+async function toggleRec(secs){
+  const btn=$('recBtn'); if(!btn)return;
+  if(mrec && mrec.state==='recording'){ stopRec(); return; }
+  if(!navigator.mediaDevices||!window.MediaRecorder){ $('tkFb').textContent='Recording is not available in this browser. Speak to a partner or use Snorkl instead.'; return; }
+  try{ const stream=await navigator.mediaDevices.getUserMedia({audio:true}); chunks=[]; mrec=new MediaRecorder(stream); mrec.ondataavailable=e=>chunks.push(e.data);
+    mrec.onstop=()=>{ stream.getTracks().forEach(t=>t.stop()); const blob=new Blob(chunks,{type:mrec.mimeType||'audio/webm'}); const url=URL.createObjectURL(blob); const a=$('recAudio'); if(a){a.src=url;a.classList.remove('hidden');} tstate.recorded=true; };
+    mrec.start(); recLeft=secs; btn.textContent='■ Stop'; btn.classList.add('stop'); tick();
+    recTimer=setInterval(()=>{ recLeft--; tick(); if(recLeft<=0) stopRec(); },1000);
+  }catch(e){ $('tkFb').textContent='Microphone blocked. Allow the microphone in Chrome and try again, or speak to a partner.'; }
+}
+function tick(){ const t=$('recTime'); if(t) t.textContent=Math.floor(recLeft/60)+':'+String(recLeft%60).padStart(2,'0'); }
+function stopRec(silent){ clearInterval(recTimer); recTimer=null; if(mrec&&mrec.state==='recording') mrec.stop(); const b=$('recBtn'); if(b&&!silent){ b.textContent='● Record again'; b.classList.remove('stop'); } }
+
+// ---- check ----
+$('tkCheck').onclick=()=>{
+  const t=curT; let pts=0, msg='';
+  if(t.type==='listen'||t.type==='passage'||t.type==='edit'){ const r=gradeMC(t.qs,'q'); pts=r*20; msg=`${r} / ${t.qs.length} correct · ${r===t.qs.length?'¡Perfecto!':'Green = correct answer.'}`; }
+  else if(t.type==='order'){ let r=0; [...$('ord').children].forEach((el,pos)=>{ const ok=+el.dataset.i===pos; el.classList.add(ok?'ok':'bad'); if(ok)r++; }); pts=r*25; msg=`${r} / 4 in the right place.`; }
+  else if(t.type==='match'){ let r=0; Object.entries(tstate.pairs).forEach(([l,rr])=>{ const ok=l===rr; document.querySelectorAll(`.mi[data-i="${l}"][data-side="l"],.mi[data-i="${rr}"][data-side="r"]`).forEach(x=>x.classList.add(ok?'ok':'bad')); if(ok)r++; }); pts=r*20; msg=`${r} / ${t.pairs.length} pairs correct.`; }
+  else if(t.type==='table'){ let r=0; t.rows.forEach((row,i)=>{ const tr=document.querySelector(`tr[data-r="${i}"]`); const sel=tr.querySelector('button.sel'); const ok=sel&&+sel.dataset.c===row[1]; tr.classList.add(ok?'ok':'bad'); if(ok)r++; else tr.querySelector(`button[data-c="${row[1]}"]`).textContent='✓'; }); pts=Math.round(r/t.rows.length*100); msg=`${r} / ${t.rows.length} rows correct. ✓ shows the right box.`; }
+  else if(t.type==='cloze'){ let r=0; document.querySelectorAll('.blank').forEach(s=>{ const ok=s.dataset.w===t.answers[+s.dataset.b]; s.classList.add(ok?'ok':'bad'); if(ok)r++; else s.textContent=t.answers[+s.dataset.b]; }); pts=r*20; msg=`${r} / 5 blanks correct.`; }
+  else if(t.type==='write'){ const words=$('wr').value.trim().split(/\s+/).filter(Boolean).length; const ck=[...document.querySelectorAll('.ck:checked')].length; if(words<t.min){ $('tkFb').textContent=`You have ${words} words — write at least ${t.min}. Add a reason or an example.`; return; } pts=60+ck*5+Math.min(20,Math.floor(words/10)); msg=`Submitted: ${words} words, ${ck}/6 checks. Copy it into Snorkl or Classroom for teacher feedback.`; }
+  else if(t.type==='speak'){ const ck=[...document.querySelectorAll('.ck:checked')].length; if(!tstate.recorded && ck<2){ $('tkFb').textContent='Record first (or speak to a partner), then check at least 2 boxes.'; return; } pts=60+ck*10; msg='Submitted! Now record the same answer in Snorkl so your teacher can hear it.'; }
+  gal[t.id]=Math.max(gal[t.id]||0,pts); safeSet('pk_gal',JSON.stringify(gal));
+  $('tkFb').textContent='⭐ '+msg+` (+${pts} pts)`; $('tkCheck').disabled=true; sfx.goal();
+};
+</script>
+</body>
+</html>
